@@ -3,19 +3,28 @@ import java.util.Arrays;
 
 public class PriorityQueue {
 
-	public static int heapsize = -1;
+	private int[] arr;
+	private int heapsize;
+	private int max;
 
-	public static void MAX_HEAPIFY(int[] arr, int i) {
+	public PriorityQueue(int max) {
+		this.max = max;
+		this.heapsize = 0;
+		arr = new int[this.max + 1];
+		arr[0] = Integer.MAX_VALUE;
+	}
+
+	public void MAX_HEAPIFY(int i) {
 
 		int largest = i;
-		int l = 2*i + 1;
-		int r = 2+i + 2;
+		int l = 2*i;
+		int r = 2+i + 1;
 
-		if (l < heapsize && arr[l] > arr[i]) {
+		if (l <= heapsize && arr[l] > arr[i]) {
 			largest = l;
 		}
 
-		if (r < heapsize && arr[r] > arr[largest]) {
+		if (r <= heapsize && arr[r] > arr[largest]) {
 			largest = r;
 		}
 
@@ -24,69 +33,57 @@ public class PriorityQueue {
 			arr[i] = arr[largest];
 			arr[largest] = temp;;
 
-			MAX_HEAPIFY(arr, largest);
+			MAX_HEAPIFY(largest);
 		}
 
 	}
 
-	public static void BUILD_MAX_HEAP(int[] arr) {
-
-		for (int i = heapsize/2; i > 0; i--) {
-			MAX_HEAPIFY(arr, i);
-		}
-
+	public int MAXIMUM() {
+		return arr[1];
 	}
 
-	public static int MAXIMUM(int[] arr) {
-		return arr[0];
-	}
+	public int EXTRACT_MAXIMUM() {
 
-	public static int EXTRACT_MAXIMUM(int[] arr) {
-
-		int max = arr[0];
-		arr[0] = arr[heapsize];
-		heapsize--;
-		MAX_HEAPIFY(arr, 0);
+		int max = arr[1];
+		arr[1] = arr[heapsize--];
+		MAX_HEAPIFY(1);
 
 		return max;
 	}
 
-	public static void CHANGE_KEY(int[] arr, int i, int key) {
+	public void CHANGE_KEY(int i, int key) {
 
 		if (key < arr[i]) {
 		
 			arr[i] = key;
-			MAX_HEAPIFY(arr, i);
+			MAX_HEAPIFY(i);
 
 		} else {
-
-			while (i > 0 && arr[i/2] < arr[i]) {
-
-				arr[i] = arr[i/2];
-				i /= 2;
-			}
-
+			
 			arr[i] = key;
+
+			while (i > 1 && arr[i/2] < arr[i]) {
+
+				int temp = arr[i];
+				arr[i] = arr[i/2];
+				arr[i/2] = temp;
+
+				i = i/2;
+			}
 		}
 	}
 
-	public static void INSERT(int[] arr, int key) {
+	public void INSERT(int key) {
 
-		heapsize++;
-		arr[heapsize] = -1*100000;
-		CHANGE_KEY(arr, heapsize, key);
+		this.heapsize++;
+		CHANGE_KEY(heapsize, key);
 
 	}
 
-	public static void PRINT_HEAP(int[] arr) {
+	public void PRINT_HEAP() {
 		
-		System.out.print("[");
-
-		for (int i = 1; i <=heapsize; i++) {
-			System.out.print(arr[i] + " ");
-		}
-
-		System.out.println("]");
+		int[] heap = Arrays.copyOfRange(arr, 1, heapsize+1);
+		System.out.println(Arrays.toString(heap));
 
 	}
 
@@ -95,43 +92,36 @@ public class PriorityQueue {
 
 		int n = Integer.parseInt(args[0]);
 
-		if (n < 8) {
-			System.err.println("n must be greater than 8");
-		}
+		PriorityQueue queue = new PriorityQueue(n);
+		Random rand = new Random();
 
-		int arr[] = new int[n];
-
-		INSERT(arr, 20);
-		INSERT(arr, 10);
-		INSERT(arr, 7);
-		INSERT(arr, 19);
-		INSERT(arr, 100);
-		INSERT(arr, 9);
-		INSERT(arr, 71);
-		INSERT(arr, 83);
+		for (int i = 1; i < n/2; i++) {
+		       	int num = rand.nextInt(100);
+			queue.INSERT(num);
+		}		
 
 		System.out.println("Initial heap:");
-		PRINT_HEAP(arr);
-		System.out.println("Maximum: " + MAXIMUM(arr));
+		queue.PRINT_HEAP();
+		System.out.println("Maximum: " + queue.MAXIMUM());
 
 		System.out.println("Change root to 3");
-		CHANGE_KEY(arr, 0, 3);
-		PRINT_HEAP(arr);
-		System.out.println("Maximum: " + MAXIMUM(arr));
+		queue.CHANGE_KEY(1, 3);
+		queue.PRINT_HEAP();
+		System.out.println("Maximum: " + queue.MAXIMUM());
 
-		System.out.println("Change n to 400");
-		CHANGE_KEY(arr, n, 400);
-		PRINT_HEAP(arr);
-		System.out.println("Maximum: " + MAXIMUM(arr));
+		System.out.println("Change n/2 to 400");
+		queue.CHANGE_KEY(n/2, 400);
+		queue.PRINT_HEAP();
+		System.out.println("Maximum: " + queue.MAXIMUM());
 
-		System.out.println("Extract maximum: " + EXTRACT_MAXIMUM(arr));
-		System.out.println("Extract maximum: " + EXTRACT_MAXIMUM(arr));	
-		System.out.println("Extract maximum: " + EXTRACT_MAXIMUM(arr));
-		System.out.println("Extract maximum: " + EXTRACT_MAXIMUM(arr));
-		System.out.println("Extract maximum: " + EXTRACT_MAXIMUM(arr));
+		System.out.println("Extract maximum: " + queue.EXTRACT_MAXIMUM());
+		System.out.println("Extract maximum: " + queue.EXTRACT_MAXIMUM());
+		System.out.println("Extract maximum: " + queue.EXTRACT_MAXIMUM());
+		System.out.println("Extract maximum: " + queue.EXTRACT_MAXIMUM());
+		System.out.println("Extract maximum: " + queue.EXTRACT_MAXIMUM());
 	
 		System.out.println("Final heap:");
-		PRINT_HEAP(arr);	
+		queue.PRINT_HEAP();	
 
 	}
 
